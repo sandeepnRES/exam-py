@@ -109,8 +109,8 @@ button#open-form-button {
 }
 
 /* Style the buttons as desired */
-#agree-button,
-#disagree-button {
+#submit-button,
+#review-button {
     padding: 10px 20px;
     margin: 10px;
 }
@@ -284,12 +284,20 @@ form {
 
 .qcell.answered {
 	background: #55ee55;
+	color: #000;
 }
 .qcell.unanswered {
 	background: #ee9999;
+	color: #000;
 }
-.qcell.selected {
+.qcell.selected,
+.qcell.selected.review {
 	background: #aaaaee;
+	color: #000;
+}
+.qcell.review {
+	background: #3333ee;
+	color: #fff;
 }
 
 .radio-label {

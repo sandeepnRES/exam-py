@@ -2,6 +2,7 @@ const qList = get("#q-list");
 const total_qnum = 120;
 
 let answered_map = new Map();
+let reviewed_map = new Map();
 const subjects = ['Mathematics', 'Quantitative Aptitude', 'Computer Awareness and English']
 const num_ques_sub = [1, 51, 91, 121]
 
@@ -90,13 +91,21 @@ async function color_qlist() {
 		const res = get_is_ans(i.toString());
 		const qnum = i.toString()
 		const qcell_i = get("#qlnum"+qnum);
-		if (answered_map.has(qnum)) {
-			if (res) {
-				qcell_i.classList.add('answered');
-				qcell_i.classList.remove('unanswered');
-			} else {
-				qcell_i.classList.add('unanswered');
-				qcell_i.classList.remove('answered');
+		if (reviewed_map.has(qnum) && reviewed_map.get(qnum)) {
+			qcell_i.classList.add('review');
+			qcell_i.classList.remove('answered');
+			qcell_i.classList.remove('unanswered');
+		} else {
+			if (answered_map.has(qnum)) {
+				if (res) {
+					qcell_i.classList.add('answered');
+					qcell_i.classList.remove('unanswered');
+					qcell_i.classList.remove('review');
+				} else {
+					qcell_i.classList.add('unanswered');
+					qcell_i.classList.remove('answered');
+					qcell_i.classList.remove('review');
+				}
 			}
 		}
 		if (curr_qid == i) {
@@ -131,42 +140,53 @@ async function load_ans() {
 }
 
 function showQuestion(qnum) {
-	curr_sub_ques_num = num_ques_sub[curr_sid];
-	next_sub_ques_num = num_ques_sub[curr_sid+1];
-	if (qnum >= curr_sub_ques_num && qnum < next_sub_ques_num) {
+	if (isQAllowed(qnum)) {
+		if (qnum !== curr_qid) {
+			console.log("show: " + qnum + ", " + curr_qid);
+			mark_curr_visited();
+		}
 		qnumStr = qnum.toString()
 		const qbox = get("#question");
 		qbox.innerHTML = "<img src='/question?num="+qnumStr+"' class='q-img' />";
 		reset_options();
 		const res = get_is_ans(qnumStr);
 		if (res) {
+			console.log("setting answer: ", qnumStr);
 			const op_ans = get("#option"+answered_map.get(qnumStr));
 			op_ans.checked=true;
 		}
 		get("#form_qnum").value=qnumStr;
-		if (qnum !== curr_qid) {
-			reset_ans(curr_qid.toString());
-		}
 		curr_qid=qnum;
 	}
 }
 
-function set_q_active(qnum) {
-	
+function isQAllowed(qnum) {
+	curr_sub_ques_num = num_ques_sub[curr_sid];
+	next_sub_ques_num = num_ques_sub[curr_sid+1];
+	if (qnum >= curr_sub_ques_num && qnum < next_sub_ques_num) {
+		return true;
+	} else {
+		return false;
+	}
 }
-	
-function unset_active_q(qnum) {
-	
-}
-
 
 function set_ans(qnum, ans) {
 	answered_map.set(qnum, ans);
 	const response = fetch('/answer?qnum='+qnum+'&ans='+ans);
 }
 
+function mark_curr_visited() {
+	qnum = curr_qid.toString()
+	if (!answered_map.has(qnum)) {
+		console.log("marking " + qnum + " visited.")
+		reset_ans(qnum);
+	}
+}
+
 function reset_ans(qnum) {
+	console.log("Reset: " + qnum)
 	answered_map.set(qnum, "");
+	reviewed_map.set(qnum, false);
 	reset_options();
 	const response = fetch('/answer?qnum='+qnum+'&ans=');
 }
@@ -181,6 +201,12 @@ function reset_options() {
 const qForm = get("#qForm");
 qForm.addEventListener("submit", event => {
     event.preventDefault();
+		console.log(event.submitter.value);
+		if (event.submitter.value == "Review") {
+			reviewed_map.set(curr_qid.toString(), true);
+		} else {
+			reviewed_map.set(curr_qid.toString(), false);
+		}
 		const formdata = new FormData(event.target);
 		const entries = Object.fromEntries(formdata.entries());
 		console.log(entries.option);
@@ -192,7 +218,7 @@ qForm.addEventListener("submit", event => {
 		set_ans(entries.form_qnum, ans);
 		const res = get_is_ans(entries.form_qnum);
 		console.log(res);
-		if (curr_qid < total_qnum) {
+		if (curr_qid < total_qnum && isQAllowed(curr_qid + 1)) {
 			curr_qid += 1;
 			showQuestion(curr_qid);
 		}
@@ -209,7 +235,7 @@ clearbtn.onclick = function() {
 
 const prevQBtn = get("#prev-ques-button");
 prevQBtn.onclick = function() {
-		if (curr_qid > 1){
+		if (curr_qid > 1 && isQAllowed(curr_qid - 1)){
 			curr_qid -= 1;
 			showQuestion(curr_qid);
 		}

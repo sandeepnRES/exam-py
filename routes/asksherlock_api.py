@@ -180,6 +180,7 @@ def result():
             elif answers_dict[qi] != "":
                 mark = WRONG_MARKS
                 correct[qi] = -1
+            else:
                 userAnsDict[qi] = "-"
         if q<51:
             mark *= MATHS_WEIGHT
