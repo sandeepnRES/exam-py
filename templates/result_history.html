@@ -10,20 +10,30 @@
       .stats-plot {
         width: 1000px;
       }
+      select {
+        margin-top: 5px;
+        margin-bottom: 5px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+      }
     </style>
 </head>
 <body>
-<input type="text" name="curr_filename" id="curr_filename" value="{{ curr_filename }}" hidden />
 <table><tr><th>
 <h1 align="center">NIMCET</h1>
 </th></tr>
 <tr><th>
-  <h2 align="center">Your result: {{ result }}</h2>
+  <h2 align="center" style="display: none;" id="marks"></h2>
 </th></tr>
 <tr><th>
   <a href="/" class="btn">Home Page</a>
-  <div id="detailsBtn" class="btn">Details</div>
+  <div id="detailsHistoryBtn" class="btn">Details</div>
 </th></tr>
+<tr><td>
+  <label for="results">Select Previous Result:</label>
+  <select name="results" id="resultids">
+  </select>
+</td></tr>
 </table>
 <hr>
 <div id="details" show>

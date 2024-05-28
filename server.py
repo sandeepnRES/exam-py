@@ -30,6 +30,12 @@ def create_app():
         # return render_template('chat.js', server_url = environ.get('HOSTURL'))
         return Response(render_template('chat.js'), mimetype='text/javascript')
     
+    # @app.route('/result.js', methods=['GET', 'POST'])
+    # def render_resultjs():
+    #     print('Rendering Result.js')
+    #     # return render_template('chat.js', server_url = environ.get('HOSTURL'))
+    #     return Response(render_template('result.js'), mimetype='text/javascript')
+    
     secure_headers = secure.Secure()
     
     @app.after_request

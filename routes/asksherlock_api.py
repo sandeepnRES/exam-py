@@ -1,7 +1,11 @@
 from flask import Blueprint, request, jsonify, send_file, render_template
 from os import environ
+import os
+from os import listdir
+from os.path import isfile, join
 import json
-from routes.stats import get_stats
+import pandas as pd
+from routes.stats import get_stats, read_df, calc_marks
 
 # load_dotenv(find_dotenv())
 from datetime import timedelta, datetime
@@ -17,11 +21,20 @@ start_time = datetime.now()
 curr_qid = 1
 curr_sub_id = 0
 curr_paper_id = "2021"
-all_paper_ids = ["2021", "2022"]
+all_paper_ids = ["2020", "2021", "2022"]
+username = "demo"
 
 def get_file_root():
     global curr_paper_id
     return "paper/"+str(curr_paper_id)+"/"
+    
+def get_user_file_root():
+    global curr_paper_id
+    global username
+    usr_dir = get_file_root()+username+"_results/"
+    if not os.path.exists(usr_dir):
+        os.makedirs(usr_dir)
+    return usr_dir
 
 bp = Blueprint('asksherlock_api', __name__)
 
@@ -75,6 +88,7 @@ def exam():
     global answers_dict
     global correct
     global curr_paper_id
+    global username
     
     if not exam_started:
         exam_started = True
@@ -86,7 +100,10 @@ def exam():
         if "paperid" in request.args:
             curr_paper_id = request.args['paperid']
         else:
-            curr_paper_id = 2021
+            curr_paper_id = "2021"
+            
+        if "username" in request.args:
+            username = request.args["username"]
         
     print(request)
     # time_left = get_timer()
@@ -165,43 +182,35 @@ def result():
     with open(get_file_root() + 'answer.json', 'r') as file:
         ansJson = file.read().rstrip()
     answersDict = json.loads(ansJson)
-    marks = 0
     subsDict = dict()
     userAnsDict = dict()
     for q in range(1,121):
         qi = str(q)
         correct[qi] = 0
-        mark = 0
         if qi in answers_dict:
             userAnsDict[qi] = answers_dict[qi]
             if answersDict[qi] == answers_dict[qi]:
-                mark = CORRECT_MARKS
-                correct[qi] = 1
+                correct[qi] = 1     # Correct Ans
             elif answers_dict[qi] != "":
-                mark = WRONG_MARKS
-                correct[qi] = -1
+                correct[qi] = -1    # Wrong Ans
             else:
                 userAnsDict[qi] = "-"
         if q<51:
-            mark *= MATHS_WEIGHT
             subsDict[qi] = 'Mathematics'
         elif q<91:
-            mark *= QUANT_WEIGHT
             subsDict[qi] = 'Quantitative Aptitude'
         elif q<111:
-            mark *= CA_WEIGHT
             subsDict[qi] = 'Computer Awareness'
         else:
-            mark *= ENG_WEIGHT
             subsDict[qi] = 'English'
-        marks += mark
-    
-    import pandas as pd
+
     df_dict = {'subject': subsDict, 'is_correct': correct, 'correct_ans': answersDict, 'user_ans': userAnsDict}
     df = pd.DataFrame(df_dict, index=subsDict.keys())
-    df.to_csv(get_file_root()+'res_'+str(datetime.now())+'.csv', index_label="qid");
-    df.to_csv(get_file_root()+'res_last.csv', index_label="qid");
-    return render_template('result.html', result=marks)
+    marks = calc_marks(df)
+    filename = 'res_'+str(datetime.now())+'.csv'
+    df.to_csv(get_user_file_root() + filename, index_label="qid");
+    df.to_csv(get_user_file_root() + 'res_last.csv', index_label="qid");
+    return render_template('result.html', result=marks, curr_filename = filename)
     
 @bp.route('/getresultdetails', methods=['GET'])
 def getresultdetails():
@@ -209,16 +218,61 @@ def getresultdetails():
         ansJson = file.read().rstrip()
     correctJson = json.dumps(correct)
     uAnsJson = json.dumps(answers_dict)
-    get_stats(get_file_root(), 'res_last.csv')
+    imfilename = get_stats(get_user_file_root(), 'res_last.csv')
 
-    return jsonify({'is_correct': correctJson, 'correct_ans': ansJson, 'user_ans': uAnsJson})
+    return jsonify({'is_correct': correctJson, 'correct_ans': ansJson, 'user_ans': uAnsJson, 'imfilename': imfilename})
     
-@bp.route('/getresultstats', methods=['GET'])
-def getresultstats():
-    outfilename = get_stats(get_file_root(), 'res_last.csv')
-    return send_file(outfilename, mimetype='image/jpg')
+@bp.route('/get_result_image', methods=['GET'])
+def get_result_image():
+    filename = get_user_file_root() + 'res_last.jpg'
+    if 'imfilename' in request.args:
+        filename = request.args['imfilename']
+    return send_file(filename, mimetype='image/jpg')
 
+@bp.route('/getresultlist', methods=['GET'])
+def getresultlist():
+    def check_csv_file(res_dir, filename):
+        if isfile(join(res_dir, filename)):
+            ext = os.path.splitext(filename)[-1].lower()
+            if ext == '.csv':
+                return True
+        return False
 
+    res_dir = get_user_file_root()
+    onlyfiles = [f for f in listdir(res_dir) if check_csv_file(res_dir, f)]
+    return jsonify({'resultlist': onlyfiles})
+
+@bp.route('/getresultbyname', methods=['GET'])
+def getresultbyname():
+    if 'filename' in request.args:
+        filename = request.args['filename']
+    else:
+        filename = 'res_last.csv'
+    df = read_df(get_user_file_root(), filename)
+    imfilename = get_stats(get_user_file_root(), filename)
+    correctJson = json.dumps(df['is_correct'].to_dict())
+    ansJson = json.dumps(df['correct_ans'].to_dict())
+    uAnsJson = json.dumps(df['user_ans'].to_dict())
+    marks = calc_marks(df)
+ 
+    return jsonify({'marks': marks, 'is_correct': correctJson, 'correct_ans': ansJson, 'user_ans': uAnsJson, 'imfilename': imfilename})
+
+@bp.route('/result_history', methods=['GET'])
+def result_history():
+    global curr_paper_id
+    global username
+    
+    if "paperid" in request.args:
+        curr_paper_id = request.args['paperid']
+    else:
+        curr_paper_id = "2021"
+        
+    if "username" in request.args:
+        username = request.args["username"]
+    else:
+        username = "demo"
+
+    return render_template('result_history.html')
 
 def init():
     print('Init function called...')

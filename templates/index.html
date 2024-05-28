@@ -17,6 +17,8 @@
     }
     th {
       text-align: center;
+      padding-top: 10px;
+      padding-bottom: 10px;
     }
     </style>
 </head>
@@ -25,12 +27,22 @@
 <table><tr><th>
 <h1>NIMCET Mock Previous Year Papers</h1>
 </th></tr>
+<tr>
+  <th>
+    Enter your name:
+    <input type='text' id='username' value='demo' />
+  </th>
+</tr>
 <tr><th>
-  <label for="papers" style="padding-top: 10px;padding-bottom: 10px;">Select exam:</label>
+  <label for="papers">Select exam:</label>
   <select name="papers" id="paperids">
   </select>
 </th></tr>
 <tr><th>
+  <span id="error" style="color: red; display: none;"hidden></span>
+</th></tr>
+<tr><th>
+  <div class="btn" id="result_history" onclick=result_history()>View Previous Results</div>
   <div class="btn" id="start_test" onclick=load_exam()>Start Exam</div>
 </th></tr></table>
 </body>
@@ -51,9 +63,30 @@
     }
   }
   function load_exam() {
+    const error_elem = get("#error");
+    error_elem.style.display = "none"
     const paperids_elem = get("#paperids");
+    const uname_elem = get("#username");
     const pid = paperids_elem.value;
-    window.location.href="/exam?paperid="+pid;
+    let username = uname_elem.value;
+    if (username == "") {
+      username="demo";
+    }
+    console.log(username);
+    window.location.href="/exam?paperid="+pid+"&username="+username;
+  }
+  function result_history() {
+    const error_elem = get("#error");
+    error_elem.style.display = "none"
+    const paperids_elem = get("#paperids");
+    const uname_elem = get("#username");
+    const pid = paperids_elem.value;
+    let username = uname_elem.value;
+    if (username == "") {
+      username="demo";
+    }
+    console.log(username);
+    window.location.href="/result_history?paperid="+pid+"&username="+username;
   }
   function get(selector, root = document) {
       return root.querySelector(selector);
