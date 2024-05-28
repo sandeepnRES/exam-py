@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Exam</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='logo.png') }}" type="image/png">
+    <style>
+    body {
+    	display: flex;
+    	justify-content: center;
+    	align-items: center;
+    	height: 100vh;
+    	background-image: var(--body-bg);
+    	font-family: 'IBM Plex Sans', sans-serif;
+    }
+    th {
+      text-align: center;
+    }
+    </style>
+</head>
+<body>
+
+<table><tr><th>
+<h1>NIMCET Mock Previous Year Papers</h1>
+</th></tr>
+<tr><th>
+  <label for="papers" style="padding-top: 10px;padding-bottom: 10px;">Select exam:</label>
+  <select name="papers" id="paperids">
+  </select>
+</th></tr>
+<tr><th>
+  <div class="btn" id="start_test" onclick=load_exam()>Start Exam</div>
+</th></tr></table>
+</body>
+<script>
+  async function load_paperids() {
+    const response = await fetch("/get_all_paperids");
+    const resJson = await response.json();
+    const all_paperids = resJson.all_paperids;
+    const paperids_elem = get("#paperids");
+    for (paperid of all_paperids) {
+      let pid_elem = document.createElement("option");
+      pid_elem.innerHTML = paperid;
+      pid_elem.value = paperid;
+      if (paperid == "2021")  {
+        pid_elem.setAttribute('selected','selected');
+      }
+      paperids_elem.appendChild(pid_elem);
+    }
+  }
+  function load_exam() {
+    const paperids_elem = get("#paperids");
+    const pid = paperids_elem.value;
+    window.location.href="/exam?paperid="+pid;
+  }
+  function get(selector, root = document) {
+      return root.querySelector(selector);
+  }
+  load_paperids();
+</script>
+</html>

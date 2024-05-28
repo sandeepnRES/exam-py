@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Exam</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='logo.png') }}" type="image/png">
+    <style>
+      .stats-plot {
+        width: 1000px;
+      }
+    </style>
+</head>
+<body>
+
+<table><tr><th>
+<h1 align="center">NIMCET</h1>
+</th></tr>
+<tr><th>
+  <h2 align="center">Your result: {{ result }}</h2>
+</th></tr>
+<tr><th>
+  <a href="/" class="btn">Home Page</a>
+  <div onclick=getResultDetails() class="btn">Details</div>
+</th></tr>
+</table>
+<hr>
+<div id="details" show>
+</div>
+</body>
+<script>
+  async function getResultDetails() {
+  	const response = await fetch('/getresultdetails');
+  	responseJson = await response.json();
+  	const delem = get("#details");
+  	const is_correct = JSON.parse(responseJson.is_correct);
+  	const correct_ans = JSON.parse(responseJson.correct_ans);
+  	const user_ans = JSON.parse(responseJson.user_ans);
+    total_ques = 120
+  	
+  	let details = "<table><tr> \
+  		<th class='rcell'>Q#</th> \
+  		<th class='rcell'>Is Correct?</th> \
+  		<th class='rcell'>Correct Ans</th> \
+  		<th class='rcell'>Your Answer</th> \
+      <th style='vertical-align: top;' rowspan=" + total_ques + "> \
+      <img src='/getresultstats' class='stats-plot'/> \
+      </th> \
+      </tr>";
+  	
+  	for (let i = 1; i <= total_ques; i++) {
+      const qi = i.toString();
+  		details += "<tr>";
+  		details += "<td class='rcell'>Q. " + qi + "</td>";
+  		details += "<td class='rcell'>" + is_correct[qi] + "</td>";
+      if (correct_ans.hasOwnProperty(qi)) {
+		    details += "<td class='rcell'>" + correct_ans[qi] + "</td>";
+      } else {
+        details += "<td></td>";
+      }
+      if (user_ans.hasOwnProperty(qi)) {
+		    details += "<td class='rcell'>" + user_ans[qi] + "</td>";
+      } else {
+        details += "<td></td>";
+      }
+  		details += "</tr>";
+  	}
+  	details += "</table>";
+  	console.log(details);
+  	delem.innerHTML = details;
+  }
+  function get(selector, root = document) {
+      return root.querySelector(selector);
+  }
+</script>
+</html>

@@ -1,0 +1,4 @@
+flask
+secure
+pandas
+matplotlib

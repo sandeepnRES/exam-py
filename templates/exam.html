@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Exam</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='logo.png') }}" type="image/png">
+</head>
+<body>
+
+<div class="header">
+  <h2 style="margin-right:50%;"><span id="subject_name"></span><span style="padding: 10px"></span>Time left: <span id="timer">{{ time_left }}</span> min</h2>
+  <div class="btn" id="end-exam">End Exam</div>
+</div>
+<hr>
+<div id="container">
+  <table style="width: 100%"><tr>
+    <th id="q-container">
+      <form id="qForm">
+        <input type="text" name="form_sub_id" id="form_sub_id" value="{{ s_id }}" hidden />
+        <input type="text" name="form_qnum" id="form_qnum" value="{{ q_id }}" hidden />
+        <div id="question">
+        </div>
+        <div id="options" style="padding-left:5%; padding-top:2%;">
+            <table><tr>
+              <th width="30%">
+                <input style="cursor: pointer;" type="radio" name="option" id="optionA" value="A" />
+                <label for="optionA" class="radio-label">Option A</label>
+              </th>
+              <th width="30%">
+                <input style="cursor: pointer;" type="radio" name="option" id="optionB" value="B" />
+                <label for="optionB" class="radio-label">Option B</label>
+              </th>
+            </tr><tr>
+              <th>
+                <input style="cursor: pointer;" type="radio" name="option" id="optionC" value="C" />
+                <label for="optionC" class="radio-label">Option C</label>
+              </th>
+              <th>
+                <input style="cursor: pointer;" type="radio" name="option" id="optionD" value="D" />
+                <label for="optionD" class="radio-label">Option D</label>
+              </th>
+            </tr></table>
+        </div>
+        <div id="next" class="button">
+          <div value="Previous" id="prev-ques-button" class="btn">Previous</div>
+          <button type="Submit" value="Submit and Next" id="agree-button" class="btn">Submit and Next</button>
+          <div value="Clear" id="clear-button" class="btn">Clear</div>
+        </div>
+      </form>
+    </th>
+    <th id="q-list">
+      
+    </th>
+  </tr></table>
+</div>
+
+</body>
+<script>
+    
+</script>
+<script src="chat.js"></script>
+</html>
