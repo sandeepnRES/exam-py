@@ -17,7 +17,7 @@ start_time = datetime.now()
 curr_qid = 1
 curr_sub_id = 0
 curr_paper_id = "2021"
-all_paper_ids = ["2021"]
+all_paper_ids = ["2021", "2022"]
 
 def get_file_root():
     global curr_paper_id
