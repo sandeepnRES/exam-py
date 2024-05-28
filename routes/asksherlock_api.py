@@ -31,7 +31,7 @@ def get_file_root():
 def get_user_file_root():
     global curr_paper_id
     global username
-    usr_dir = get_file_root()+username+"_results/"
+    usr_dir = get_file_root()+"results_" + username + "/"
     if not os.path.exists(usr_dir):
         os.makedirs(usr_dir)
     return usr_dir
