@@ -196,6 +196,9 @@ def result():
                 correct[qi] = -1    # Wrong Ans
             else:
                 userAnsDict[qi] = "-"
+            
+            if answersDict[qi] == "*":
+                correct[qi] = 1     # Correct Ans
         if q<51:
             subsDict[qi] = 'Mathematics'
         elif q<91:
