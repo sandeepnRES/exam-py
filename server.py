@@ -4,7 +4,6 @@ import secure
 from os import environ
 
 from routes import asksherlock_api
-from routes.asksherlock_api import get_timer
 
 def create_app():
     app = Flask(__name__)
@@ -22,7 +21,7 @@ def create_app():
     @app.route('/', methods=['GET', 'POST'])
     def welcome():
         print('Welcome to Exam: NIMCET')
-        return render_template('index.html')
+        return render_template('index.html', username=asksherlock_api.get_username())
     
     @app.route('/chat.js', methods=['GET', 'POST'])
     def render_chatjs():

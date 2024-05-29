@@ -24,6 +24,14 @@ curr_paper_id = "2021"
 all_paper_ids = ["2020", "2021", "2022"]
 username = "demo"
 
+def get_username():
+    global username
+    return username
+
+def set_username(uname):
+    global username
+    username = uname.lower()
+
 def get_file_root():
     global curr_paper_id
     return "paper/"+str(curr_paper_id)+"/"
@@ -88,7 +96,6 @@ def exam():
     global answers_dict
     global correct
     global curr_paper_id
-    global username
     
     if not exam_started:
         exam_started = True
@@ -103,7 +110,7 @@ def exam():
             curr_paper_id = "2021"
             
         if "username" in request.args:
-            username = request.args["username"]
+            set_username(request.args["username"])
         
     print(request)
     # time_left = get_timer()
@@ -172,12 +179,6 @@ def getanswers():
 @bp.route('/result', methods=['GET'])
 def result():
     global exam_started
-    CORRECT_MARKS = 4
-    WRONG_MARKS = -1
-    MATHS_WEIGHT = 3
-    QUANT_WEIGHT = 1.5
-    CA_WEIGHT = 2
-    ENG_WEIGHT = 1
     exam_started = False
     with open(get_file_root() + 'answer.json', 'r') as file:
         ansJson = file.read().rstrip()
@@ -210,7 +211,7 @@ def result():
     filename = 'res_'+str(datetime.now())+'.csv'
     df.to_csv(get_user_file_root() + filename, index_label="qid");
     df.to_csv(get_user_file_root() + 'res_last.csv', index_label="qid");
-    return render_template('result.html', result=marks, curr_filename = filename)
+    return render_template('result.html', result=marks, username = get_username(), curr_filename = filename)
     
 @bp.route('/getresultdetails', methods=['GET'])
 def getresultdetails():
@@ -272,7 +273,7 @@ def result_history():
     else:
         username = "demo"
 
-    return render_template('result_history.html')
+    return render_template('result_history.html', username = get_username())
 
 def init():
     print('Init function called...')

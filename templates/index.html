@@ -30,7 +30,7 @@
 <tr>
   <th>
     Enter your name:
-    <input type='text' id='username' value='demo' />
+    <input type='text' id='username' value='{{ username }}' />
   </th>
 </tr>
 <tr><th>
@@ -66,9 +66,8 @@
     const error_elem = get("#error");
     error_elem.style.display = "none"
     const paperids_elem = get("#paperids");
-    const uname_elem = get("#username");
+    let username = get("#username").value.toLowerCase();
     const pid = paperids_elem.value;
-    let username = uname_elem.value;
     if (username == "") {
       username="demo";
     }
@@ -79,9 +78,8 @@
     const error_elem = get("#error");
     error_elem.style.display = "none"
     const paperids_elem = get("#paperids");
-    const uname_elem = get("#username");
+    let username = get("#username").value.toLowerCase();
     const pid = paperids_elem.value;
-    let username = uname_elem.value;
     if (username == "") {
       username="demo";
     }

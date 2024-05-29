@@ -3,6 +3,7 @@ const total_qnum = 120;
 const sync_delay = 100;
 
 let answered_map = new Map();
+let qtime_map = new Map();
 let reviewed_map = new Map();
 const subjects = ['Mathematics', 'Quantitative Aptitude', 'Computer Awareness and English']
 const num_ques_sub = [1, 51, 91, 121]
