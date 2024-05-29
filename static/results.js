@@ -63,7 +63,6 @@ function showResults(responseJson) {
 		details += "</tr>";
 	}
 	details += "</table>";
-	console.log(details);
 	delem.innerHTML = details;
 }
 

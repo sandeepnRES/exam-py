@@ -1,5 +1,6 @@
 const qList = get("#q-list");
 const total_qnum = 120;
+const sync_delay = 100;
 
 let answered_map = new Map();
 let reviewed_map = new Map();
@@ -50,6 +51,8 @@ async function timer_show() {
 		await timer.dec();
 		timer_span.innerHTML = timer.getString();
 	}
+	mark_curr_visited();
+	await new Promise(r => setTimeout(r, sync_delay));
 	if (timer.isZero() && curr_sid == 2) {
 		window.location.href="/result"
 	} else if(timer.isZero()) {
@@ -242,7 +245,9 @@ prevQBtn.onclick = function() {
 };
 
 const endBtn = get("#end-exam");
-endBtn.onclick = function() {
+endBtn.onclick = async function() {
+		mark_curr_visited();
+		await new Promise(r => setTimeout(r, sync_delay));
 		window.location.href="/result"
 };
 
