@@ -25,7 +25,7 @@ function onLoad() {
   let qlisthtml = "<table style='border: 1px solid black;'><tr>"
   for (let i = 0; i < total_qnum; i++) {
 		l = i+1;
-		if (i>0 && i%8 == 0) {
+		if (i>0 && i%10 == 0) {
 			qlisthtml += "</tr><tr>"
 		}
 		qlisthtml += 
