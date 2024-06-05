@@ -21,7 +21,8 @@ start_time = datetime.now()
 curr_qid = 1
 curr_sub_id = 0
 curr_paper_id = "2021"
-all_paper_ids = ["2019", "2020", "2021", "2022", "2023"]
+cs_pids = ["2016", "2017", "2018"]
+all_paper_ids = ["2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023"]
 username = "demo"
 
 def get_username():
@@ -47,6 +48,17 @@ def get_user_file_root():
 bp = Blueprint('asksherlock_api', __name__)
 
 
+def get_sub_time(sid):
+    global sub_time
+    if curr_paper_id in cs_pids:
+        print("only cs")
+        if sid == 2:
+            return 25 * 60
+        else:
+            return 1
+    else:
+        return sub_time[sid] * 60
+
 def get_time_left():
     global start_time
     global curr_sub_id
@@ -54,7 +66,7 @@ def get_time_left():
     time_diff = curr_time - start_time
     print("ct", curr_time)
     print("st", start_time)
-    exam_time = timedelta(minutes=sub_time[curr_sub_id])
+    exam_time = timedelta(seconds=get_sub_time(curr_sub_id))
     # exam_time = timedelta(seconds=10)
     rem_time = exam_time - time_diff
     if rem_time >= timedelta(seconds=0):
